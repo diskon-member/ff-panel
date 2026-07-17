@@ -39,8 +39,10 @@ jobs:
         run: |
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/cmdline-tools/bin:$ANDROID_HOME/build-tools/34.0.0:$PATH
-          gradle wrapper --gradle-version 8.2 --no-daemon
-          sed -i 's/9.6.1/8.2/g' gradle/wrapper/gradle-wrapper.properties
+          curl -L -o gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          unzip -q gradle.zip
+          export PATH=$PWD/gradle-8.2/bin:$PATH
+          gradle wrapper --gradle-version 8.2
           ./gradlew assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
