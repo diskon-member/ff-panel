@@ -30,11 +30,6 @@ jobs:
           cp AndroidManifest.xml app/src/main/
           cp device_admin_receiver.xml app/src/main/res/xml/
           cp accessibility_config.xml app/src/main/res/xml/
-      - name: Create app build file
-        run: |
-          echo 'apply plugin: "com.android.application"' > app/build.gradle
-          echo 'android { namespace "com.my.newproject"; compileSdk 34; defaultConfig { applicationId "com.my.newproject"; minSdk 21; targetSdk 34; versionCode 1; versionName "1.0" } }' >> app/build.gradle
-          echo 'dependencies { implementation "io.socket:socket.io-client:2.0.1" }' >> app/build.gradle
       - name: Build APK
         run: |
           export ANDROID_HOME=$HOME/android-sdk
