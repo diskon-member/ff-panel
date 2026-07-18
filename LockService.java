@@ -1,9 +1,6 @@
 package com.my.newproject;
 
 import android.app.Service;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,8 +28,6 @@ import java.net.URL;
 
 public class LockService extends Service {
 
-    private DevicePolicyManager dpm;
-    private ComponentName adminComponent;
     private Socket socket;
     private Vibrator vibrator;
     private ToneGenerator tone;
@@ -45,8 +40,6 @@ public class LockService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-        adminComponent = new ComponentName(this, AdminReceiver.class);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         tone = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
         handler = new Handler();
@@ -303,4 +296,4 @@ public class LockService extends Service {
         if (socket != null) socket.disconnect();
         super.onDestroy();
     }
-            }
+                 }
