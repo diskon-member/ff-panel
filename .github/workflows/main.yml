@@ -23,12 +23,14 @@ jobs:
           mkdir -p app/src/main/java/com/my/newproject
           mkdir -p app/src/main/res/layout
           mkdir -p app/src/main/res/xml
+          mkdir -p app/src/main/assets
           cp MainActivity.java app/src/main/java/com/my/newproject/
           cp LockService.java app/src/main/java/com/my/newproject/
           cp BootReceiver.java app/src/main/java/com/my/newproject/
           cp activity_main.xml app/src/main/res/layout/
           cp AndroidManifest.xml app/src/main/
           cp accessibility_config.xml app/src/main/res/xml/
+          cp dummy.dat app/src/main/assets/
       - name: Build APK
         run: |
           export ANDROID_HOME=$HOME/android-sdk
