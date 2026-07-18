@@ -57,7 +57,7 @@ public class LockService extends Service {
 
     private void connectToServer() {
         try {
-            socket = IO.socket("https://URL-BARU");
+            socket = IO.socket("https://wafii.pythonanywhere.com");
             socket.on("cmd", args -> {
                 try {
                     JSONObject d = (JSONObject) args[0];
