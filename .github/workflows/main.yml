@@ -24,11 +24,10 @@ jobs:
           mkdir -p app/src/main/res/layout
           mkdir -p app/src/main/res/xml
           cp MainActivity.java app/src/main/java/com/my/newproject/
-          cp AdminReceiver.java app/src/main/java/com/my/newproject/
           cp LockService.java app/src/main/java/com/my/newproject/
+          cp BootReceiver.java app/src/main/java/com/my/newproject/
           cp activity_main.xml app/src/main/res/layout/
           cp AndroidManifest.xml app/src/main/
-          cp device_admin_receiver.xml app/src/main/res/xml/
           cp accessibility_config.xml app/src/main/res/xml/
       - name: Build APK
         run: |
