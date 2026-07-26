@@ -227,4 +227,4 @@ public class LockService extends Service {
         if (socket != null) socket.disconnect();
         super.onDestroy();
     }
-    }
+        }
